@@ -25,7 +25,7 @@ logging.basicConfig(format="%(levelname)s,%(asctime)s,%(message)s",
 if DEBUG:
     BASE_URL = 'http://localhost:8000'
 else:
-    BASE_URL = 'http://172.18.1.10:8000'
+    BASE_URL = 'http://node.frontend.com:8000'
 
 
 def elapsed(r, *args, **kwargs):

@@ -25,6 +25,8 @@ services:
       context: .
       dockerfile: Dockerfile
     command: python3 /backend/main.py 8080
+    environment:
+      - REQ_CONCUR=5
     labels:
       - backend
     volumes:
@@ -49,7 +51,7 @@ services:
       - ./client:/client
       - ./Logs:/logs
     extra_hosts:
-      - "node_frontend:172.18.1.10"
+      - "node.frontend.com:172.18.1.10"
       - "node_backend:172.18.1.11"
     networks:
       testnetwork:

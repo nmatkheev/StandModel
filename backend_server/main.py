@@ -8,9 +8,9 @@ import socket
 from aiohttp import web
 from routes import setup_routes
 from log_config import LOGGING
+import os
 
-
-CONCURRENT_REQ = 5
+CONCURRENT_REQ = int(os.environ['REQ_CONCUR'])
 PORT = int(sys.argv[1])
 
 
