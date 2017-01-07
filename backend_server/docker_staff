@@ -1,0 +1,14 @@
+docker network create --subnet=172.18.0.0/16 testnetwork
+
+docker run --name node1 --hostname node1 --net testnetwork --ip 172.18.0.3 -itd debian /bin/bash
+
+docker attach xxxxxx
+  echo 'node2 172.18.0.2' >> /etc/hosts
+
+
+docker run --name django_test --network="testmodel_testnetwork" --ip="172.18.1.23" \
+--expose=8000 -itd -v /home/matkheev/PycharmProjects/TestModel/FrontendService:/frontend \
+-v /home/matkheev/PycharmProjects/TestModel/Logs:/logs  testmodel_frontend /bin/bash
+
+
+sudo find . -name "*.log" -type f -delete

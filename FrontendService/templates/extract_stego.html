@@ -1,0 +1,26 @@
+{% extends 'base_cabinet.html' %}
+{% load bootstrap3 %}
+
+
+{% block alert %}
+    <strong>{{ othererr.errors }}</strong>
+    <strong>{{ uploaderr.errors }}</strong>
+    <strong>{{ status }}</strong>
+{% endblock %}
+
+
+{% block cab_content %}
+    <h2>Извлечение сообщения из PDF / Extracting message from PDF </h2>
+    <div class="form-group">
+        <form method="post" id="extract_stego" class="extract_stego" action="/extract/" accept-charset="UTF-8" enctype="multipart/form-data">
+            {% csrf_token %}
+            <table>
+                {% bootstrap_form extractform %}
+                {% bootstrap_form uploadform %}
+            </table>
+           <div>
+             <input type="submit" value="Извлечь / Extract" name="commit" class="btn-create btn">
+           </div>
+        </form>
+    </div>
+{% endblock %}

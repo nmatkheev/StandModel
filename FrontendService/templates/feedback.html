@@ -1,0 +1,25 @@
+{% extends 'base_cabinet.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{% block alert %}
+    <strong>{{ status }}</strong>
+{% endblock %}
+
+{% block cab_content %}
+    <h2>Обратная связь / Feedback </h2>
+    <p></p>
+    <p>Связаться с нами просто!</p>
+
+    <div class="form-group">
+        <form method="post" id="feedback_stego" class="feedback_stego" action="/feedback/" accept-charset="UTF-8" enctype="multipart/form-data">
+            {% csrf_token %}
+            <table>
+                {% bootstrap_form feedbackform %}
+            </table>
+           <div>
+             <input type="submit" value="Отправить / Send" name="commit" class="btn-create btn">
+           </div>
+        </form>
+    </div>
+{% endblock %}

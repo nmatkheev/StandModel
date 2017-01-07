@@ -1,0 +1,67 @@
+version: '2'
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python3 /frontend/manage.py runserver 0.0.0.0:8000
+    labels:
+      - frontend
+    volumes:
+      - ./FrontendService:/frontend
+      - ./Logs:/logs
+    ports:
+      - 8000:8000
+    extra_hosts:
+      - "node_backend:172.18.1.11"
+      - "node_client:172.18.1.9"
+    networks:
+      testnetwork:
+        ipv4_address: 172.18.1.10
+    links:
+    - backend
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python3 /backend/main.py 8080
+    labels:
+      - backend
+    volumes:
+      - ./backend_server:/backend
+      - ./Logs:/logs
+    expose:
+      - 8080
+    extra_hosts:
+      - "node_frontend:172.18.1.10"
+      - "node_client:172.18.1.9"
+    networks:
+      testnetwork:
+        ipv4_address: 172.18.1.11
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python3 /client/parallel_test.py
+    labels:
+      - client
+    volumes:
+      - ./client:/client
+      - ./Logs:/logs
+    extra_hosts:
+      - "node_frontend:172.18.1.10"
+      - "node_backend:172.18.1.11"
+    networks:
+      testnetwork:
+        ipv4_address: 172.18.1.9
+    links:
+    - frontend
+    - backend
+networks:
+  testnetwork:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.18.1.0/24
+
