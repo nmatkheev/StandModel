@@ -10,8 +10,12 @@ from routes import setup_routes
 from log_config import LOGGING
 import os
 
-CONCURRENT_REQ = int(os.environ['REQ_CONCUR'])
-PORT = int(sys.argv[1])
+try:
+    CONCURRENT_REQ = int(os.environ['REQ_CONCUR'])
+    PORT = int(sys.argv[1])
+except:
+    CONCURRENT_REQ = 1
+    PORT = 8080
 
 
 def init(loop):
