@@ -1,3 +1,4 @@
+import os
 import grequests
 import requests
 import logging
@@ -6,7 +7,7 @@ import random
 import time
 import socket
 import datetime
-from django.utils.encoding import smart_str, smart_text
+from django.utils.encoding import smart_str
 
 DEBUG = False
 
@@ -21,7 +22,7 @@ logging.basicConfig(format="%(levelname)s,%(asctime)s,%(message)s",
                     datefmt='%d/%m/%Y %H:%M:%S',
                     filename=suffix+"client_{0}_{1}.log".format(socket.gethostname(),
                                                    datetime.datetime.now().strftime("%d%m_%H%M")))
-# BASE_URL = 'http://node_frontend:8000'
+
 if DEBUG:
     BASE_URL = 'http://localhost:8000'
 else:
@@ -36,11 +37,12 @@ def exception_handler(request, exception):
     _uuid = str(request.kwargs['data']['uuid'])
     logging.warning("Request,Failed,uuid,%s,Elapsed,0,Status,0,URL,%s", _uuid, request.url)
 
+try:
+    N = int(os.environ['CONCURRENCY'])
+except:
+    N = 10
 
-_ids = [uuid.uuid1() for x in range(5)]
-counts = [x for x in range(10)]
-
-megalist = list(zip(_ids, counts))
+megalist = [x for x in range(N)]
 
 while True:
     reqs = [
@@ -64,7 +66,7 @@ while True:
                            files={'docfile': (
                            'payload.pdf', open(store+'payload.pdf', 'rb'), 'application/pdf', {'Expires': '0'})},
                            hooks=dict(response=elapsed))
-            for (x, y) in megalist]
+            for y in megalist]
 
     grequests.map(reqs, exception_handler=exception_handler)
     time.sleep(random.randint(10, 20))
