@@ -18,19 +18,23 @@ else:
     store = "/client/"
 
 logging.basicConfig(format="%(levelname)s,%(asctime)s,%(message)s",
+                    datefmt='%d/%m/%Y %H:%M:%S',
                     filename=suffix+"client_{0}_{1}.log".format(socket.gethostname(),
                                                    datetime.datetime.now().strftime("%d%m_%H%M")))
 # BASE_URL = 'http://node_frontend:8000'
-BASE_URL = 'http://172.18.1.10:8000'
-# BASE_URL = 'http://localhost:8000'
+if DEBUG:
+    BASE_URL = 'http://localhost:8000'
+else:
+    BASE_URL = 'http://172.18.1.10:8000'
 
 
 def elapsed(r, *args, **kwargs):
-    logging.warning("Request,Success,Elapsed,%s,Status,%s,URL,%s", r.elapsed, r.status_code, r.url)
+    logging.warning("Request,Success,uuid,%s,Elapsed,%s,Status,%s,URL,%s", "", r.elapsed.seconds, r.status_code, r.url)
 
 
 def exception_handler(request, exception):
-    logging.warning("Request,Failed,%s", exception)
+    _uuid = str(request.kwargs['data']['uuid'])
+    logging.warning("Request,Failed,uuid,%s,Elapsed,0,Status,0,URL,%s", _uuid, request.url)
 
 
 _ids = [uuid.uuid1() for x in range(5)]
@@ -39,10 +43,12 @@ counts = [x for x in range(10)]
 megalist = list(zip(_ids, counts))
 
 while True:
-    reqs = [grequests.post(BASE_URL + "/submit/",
+    reqs = [
+            grequests.post(BASE_URL + "/submit/",
                            data={
                                'password': smart_str(u'protect_me'),
                                'payload': smart_str(u'Illusion of security'),
+                               'uuid': uuid.uuid1(),
                                'commit': smart_str(u'Вкрапить / Embed'),
                            },
                            files={'docfile': (
@@ -52,6 +58,7 @@ while True:
             grequests.post(BASE_URL + "/extract/",
                            data={
                                'password': smart_str(u'protect_me'),
+                               'uuid': uuid.uuid1(),
                                'commit': smart_str(u'Извлечь / Extract')
                            },
                            files={'docfile': (

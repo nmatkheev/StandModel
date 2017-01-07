@@ -28,74 +28,6 @@ import requests
 from Portal.settings import BACKEND_URL, BASE_DIR
 
 
-####################
-#    Deprecated    #
-####################
-# def signin_view(request):
-#     c = {}
-#     c.update(csrf(request))
-#     # return render('login.html', c, context_instance=RequestContext(request))
-#     return render(request, 'login.html', c, context_instance=RequestContext(request))
-#
-#
-# def signout_view(request):
-#     auth.logout(request)
-#     return HttpResponseRedirect('/users/signin/')
-#     # return render(request, 'login.html', context_instance=RequestContext(request))
-#
-#
-# def auth_view(request):
-#     if request.method == 'POST':
-#         username = request.POST.get('user[login]', '')
-#         password = request.POST.get('user[password]', '')
-#
-#         user = auth.authenticate(username=username, password=password)
-#
-#         if user is not None:
-#             auth.login(request, user)
-#             return HttpResponseRedirect('/')
-#         else:
-#             return HttpResponseRedirect('/users/baduser')
-#
-#
-# # Похоже что эта вьюха уже не нужна-------------------------------------------------------------------------------------
-# def authorized_view(request):
-#     if request.user.is_authenticated():
-#         # return render(request, 'cabinet.html', {'username': request.user.username}, context_instance=RequestContext(request))
-#         return HttpResponseRedirect('/')
-#     elif not request.user.is_authenticated():
-#         return render(request, 'login.html', context_instance=RequestContext(request))
-#
-#
-# def baduser_view(request):
-#     # return HttpResponseRedirect(reverse(signin_view, args={'baduser': True}))
-#     return render(request, 'login.html', {'baduser': True}, context_instance=RequestContext(request))
-#
-#
-# def cabinet(request):
-#     if request.user.is_authenticated():
-#         return render(request, 'cabinet.html', {'username': request.user.username}, context_instance=RequestContext(request))
-#     elif not request.user.is_authenticated():
-#         return render(request, 'login.html', context_instance=RequestContext(request))
-#
-#
-# def signup_view(request):
-#     if request.method == 'POST':
-#         # form = UserCreationForm(request.POST)
-#         form = MyRegistrationForm(request.POST)
-#
-#         if form.is_valid():
-#             form.save()
-#             return HttpResponseRedirect('/users/signup_success/')
-#
-#     args = {'form': MyRegistrationForm(), 'valid': False}
-#     return render_to_response('register.html', args, context_instance=RequestContext(request))
-#
-#
-# def signup_success(request):
-#     return render(request, 'register_success.html', context_instance=RequestContext(request))
-
-
 def cabinet(request):
     # return render(request, 'cabinet.html', {'username': request.user.username}, context_instance=RequestContext(request))
     return render(request, 'cabinet.html')
@@ -176,7 +108,7 @@ def submit_stego_object(request):
         if uploadform.is_valid() and attributeform.is_valid():
             attrdata = attributeform.cleaned_data
 
-            _uuid = uuid.uuid1()
+            _uuid = attributeform.data['uuid']
             payload = smart_text(attrdata.get('payload'))
             password = smart_text(attrdata.get('password'))
 
@@ -243,7 +175,7 @@ def extract_stego_object(request):
             attrdata = extractform.cleaned_data
             password = smart_text(attrdata.get('password'))
             income_file = handle_upload(request.FILES['docfile'])
-            _uuid = uuid.uuid1()
+            _uuid = extractform.data['uuid']
 
             extracted = 'Extracted content of file...'
             logger.info("EXTRACT,began,uuid,%s,TIME,%d",
