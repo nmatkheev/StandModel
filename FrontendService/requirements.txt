@@ -1,4 +1,0 @@
-Django
-django-bootstrap-form
-django-bootstrap3
-

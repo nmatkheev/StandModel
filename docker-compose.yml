@@ -15,6 +15,9 @@ services:
     extra_hosts:
       - "node_backend:172.18.1.11"
       - "node_client:172.18.1.9"
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
     networks:
       testnetwork:
         ipv4_address: 172.18.1.10
@@ -26,12 +29,15 @@ services:
       dockerfile: Dockerfile
     command: python3 /backend/main.py 8080
     environment:
-      - REQ_CONCUR=5
+      - REQ_CONCUR=2
     labels:
       - backend
     volumes:
-      - ./backend_server:/backend
+      - ./Backend_PoolAsync:/backend
       - ./Logs:/logs
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
     expose:
       - 8080
     extra_hosts:
@@ -48,10 +54,13 @@ services:
     labels:
       - client
     environment:
-      - CONCURRENCY=10
+      - CONCURRENCY=30
     volumes:
       - ./client:/client
       - ./Logs:/logs
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
     extra_hosts:
       - "node.frontend.com:172.18.1.10"
       - "node_backend:172.18.1.11"

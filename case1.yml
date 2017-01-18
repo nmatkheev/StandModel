@@ -1,0 +1,113 @@
+# Case 1 - one-threaded sync frontend, two one-threaded sync backends
+version: '2'
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python3 /frontend/main.py 8080
+    environment:
+      - heavy=http://node_backend1:8081
+      - light=http://node_backend2:8082
+      - REQ_CONCUR=1
+    labels:
+      - frontend
+    volumes:
+      - ./Frontend_Sync:/frontend
+      - ./Logs:/logs
+    ports:
+      - 8080:8080
+    extra_hosts:
+      - "node_backend1:172.18.1.11"
+      - "node_backend2:172.18.1.12"
+      - "node_client:172.18.1.9"
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    networks:
+      testnetwork:
+        ipv4_address: 172.18.1.10
+    links:
+    - backend1
+    - backend2
+  backend1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python3 /backend/main.py 8081
+    environment:
+      - REQ_CONCUR=1
+    labels:
+      - backend_heavy
+    volumes:
+      - ./Backend_Sync:/backend
+      - ./Logs:/logs
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    expose:
+      - 8081
+    extra_hosts:
+      - "node_frontend:172.18.1.10"
+      - "node_client:172.18.1.9"
+    networks:
+      testnetwork:
+        ipv4_address: 172.18.1.11
+  backend2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python3 /backend/main.py 8082
+    environment:
+      - REQ_CONCUR=1
+    labels:
+      - backend_light
+    volumes:
+      - ./Backend_Sync:/backend
+      - ./Logs:/logs
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    expose:
+      - 8082
+    extra_hosts:
+      - "node_frontend:172.18.1.10"
+      - "node_client:172.18.1.9"
+    networks:
+      testnetwork:
+        ipv4_address: 172.18.1.12
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python3 /client/async_client.py
+    labels:
+      - client
+    environment:
+      - CONCURRENCY=10
+      - FRONT=http://node_frontend:8080/{}
+      - OVERALL=100
+      - HEAVY_RATIO=0.5
+    volumes:
+      - ./client:/client
+      - ./Logs:/logs
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    extra_hosts:
+      - "node_frontend:172.18.1.10"
+      - "node_backend1:172.18.1.11"
+      - "node_backend2:172.18.1.13"
+    networks:
+      testnetwork:
+        ipv4_address: 172.18.1.9
+    links:
+    - frontend
+networks:
+  testnetwork:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.18.1.0/24
+
